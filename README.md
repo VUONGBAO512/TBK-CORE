@@ -28,16 +28,44 @@ TBK Core là ứng dụng máy tính nguyên bản chạy trên nền **Tauri 2*
 
 ---
 
-## 🛠️ Hướng dẫn Khởi chạy và Kiểm thử
+## 🛠️ Hướng dẫn Khởi chạy và Build trên từng hệ điều hành
 
+### 1. Dành cho Windows:
 ```powershell
-# Chạy toàn bộ test suite Rust
-cargo test --workspace
-
-# Biên dịch frontend
+# Chạy ở chế độ phát triển (Dev)
 cd apps/desktop
-npm run build
-
-# Khởi chạy ứng dụng Desktop
+npm install
 npm run tauri dev
+
+# Đóng gói bản Release chính thức
+cargo build --release --bin TBK_Core --manifest-path src-tauri/Cargo.toml
+```
+
+---
+
+### 2. Dành cho Linux (Ubuntu / Debian / Mint / Fedora / Arch):
+Tauri trên Linux cần thư viện giao diện đồ họa WebKitGTK. Nếu bạn gặp lỗi khi chạy trên Linux, hãy cài đặt các thư viện hệ thống cần thiết bằng 1 lệnh duy nhất:
+
+#### Với Ubuntu / Debian:
+```bash
+# 1. Cài đặt các gói phụ thuộc WebKit & đồ họa
+sudo apt update
+sudo apt install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+# 2. Khởi chạy ứng dụng
+cd apps/desktop
+npm install
+npm run tauri dev
+```
+
+#### Với Fedora:
+```bash
+sudo dnf check-update
+sudo dnf install webkit2gtk4.1-devel openssl-devel curl wget file libappindicator-gtk3-devel librsvg2-devel
+```
+
+#### Với Arch Linux:
+```bash
+sudo pacman -Syu
+sudo pacman -S webkit2gtk-4.1 base-devel curl wget openssl libappindicator-gtk3 librsvg
 ```
