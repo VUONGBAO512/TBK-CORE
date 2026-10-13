@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TBK Core — Chăm sóc sức khỏe máy tính & Kiểm tra Online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --navy: #0f2744;
+      --navy-hover: #1e3a5f;
+      --teal: #0d9488;
+      --cyan: #0284c7;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 18px;
+      --radius-sm: 10px;
+      --shadow: 0 4px 20px rgba(15, 39, 68, 0.06);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 30px 20px;
+    }
+    .container { max-width: 980px; margin: 0 auto; }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--navy);
+      text-decoration: none;
+    }
+    .brand svg { width: 28px; height: 28px; stroke: var(--navy); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(13, 148, 136, 0.1);
+      color: var(--teal);
+    }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); }
+
+    /* Hero Section */
+    .hero {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 34px;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 12px;
+      letter-spacing: -0.6px;
+    }
+    .hero p {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 620px;
+      margin: 0 auto 24px;
+    }
+
+    /* Connection Banner */
+    .connection-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 24px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: #f1f5f9;
+      transition: all 0.3s ease;
+    }
+    .connection-status.connected {
+      background: rgba(13, 148, 136, 0.08);
+      border-color: rgba(13, 148, 136, 0.3);
+      color: var(--teal);
+    }
+
+    /* Grid cards */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-bottom: 26px;
+      text-align: left;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+    .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .card-val {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .card-sub { font-size: 12.5px; color: var(--muted); }
+
+    /* Benchmark Result Box */
+    .result-box {
+      display: none;
+      background: rgba(2, 132, 199, 0.06);
+      border: 1px solid rgba(2, 132, 199, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      margin-top: 18px;
+      text-align: left;
+    }
+    .result-box h4 { color: var(--cyan); font-size: 15px; margin-bottom: 6px; }
+    .result-box p { font-size: 13px; color: var(--text); margin-bottom: 0; }
+
+    /* Actions */
+    .cta-box {
+      background: linear-gradient(135deg, #0f2744 0%, #1e3a5f 100%);
+      color: #ffffff;
+      border-radius: var(--radius);
+      padding: 36px 30px;
+      text-align: center;
+    }
+    .cta-box h2 { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+    .cta-box p { font-size: 14px; opacity: 0.85; max-width: 580px; margin: 0 auto 20px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+    }
+    .btn-download {
+      background: #ffffff;
+      color: var(--navy);
+    }
+    .btn-download:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .btn-check {
+      background: var(--teal);
+      color: #ffffff;
+    }
+    .btn-check:hover { background: #0f766e; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header class="header">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/>
+        <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/>
+        <circle cx="20" cy="10" r="2"/>
+      </svg>
+      <span>TBK Core.</span>
+    </div>
+    <div class="badge">
+      <span class="dot"></span>
+      <span>KIỂM TRA MÁY TÍNH ONLINE</span>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1>Máy tính khỏe hơn. Mọi thứ đơn giản hơn.</h1>
+    <p>Kiểm tra hiệu năng cơ bản trực tiếp ngay trên trình duyệt, hoặc tải ứng dụng TBK Core Desktop về máy để quét chuyên sâu 100% phần cứng thật.</p>
+    
+    <!-- Local pairing status indicator -->
+    <div id="connectionStatus" class="connection-status">
+      <span id="statusText">🔄 Đang kiểm tra kết nối với ứng dụng Desktop...</span>
+      <span id="statusIndicator">Web Mode (Ước tính)</span>
+    </div>
+
+    <!-- Live Telemetry Grid -->
+    <div class="grid">
+      <div class="card">
+        <div class="card-title">Bộ vi xử lý (CPU)</div>
+        <div id="cpuVal" class="card-val">Đang đọc...</div>
+        <div id="cpuSub" class="card-sub">Nhận diện qua Web API</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Bộ nhớ (RAM)</div>
+        <div id="ramVal" class="card-val">Đang đọc...</div>
+        <div id="ramSub" class="card-sub">Giới hạn Sandbox Trình duyệt</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Ổ đĩa lưu trữ (C:, D:)</div>
+        <div id="diskVal" class="card-val">Cần cài App</div>
+        <div id="diskSub" class="card-sub">Trình duyệt bị chặn quyền đọc ổ đĩa</div>
+      </div>
+    </div>
+
+    <button id="runBenchmarkBtn" class="btn btn-check" onclick="runWebBenchmark()">
+      ⚡ Bắt đầu đo tốc độ xử lý trên Web
+    </button>
+
+    <div id="resultBox" class="result-box">
+      <h4 id="resultTitle">✅ Đã hoàn tất bài kiểm tra!</h4>
+      <p id="resultDesc"></p>
+    </div>
+  </div>
+
+  <!-- Download CTA Box -->
+  <div class="cta-box">
+    <h2>Tải TBK Core cho Windows</h2>
+    <p>Để đo nhiệt độ vi xử lý, xung nhịp MHz chi tiết từng nhân, quét dung lượng ổ C: và kiểm tra tiến trình độc hại mà trình duyệt web không thể đọc được.</p>
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <a href="downloads/TBK_Core_Setup.exe" download="TBK_Core_Setup.exe" class="btn btn-download">
+        📥 Tải File EXE (Khuyên dùng)
+      </a>
+      <a href="downloads/TBK_Core_Windows_x64.zip" download="TBK_Core_Windows_x64.zip" class="btn" style="background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3);">
+        📦 Tải Bản Nén ZIP (3 MB)
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  let isDesktopConnected = false;
+
+  // 1. Nhận diện phần cứng qua trình duyệt ngay khi mở trang
+  function detectBrowserMetrics() {
+    try {
+      const cores = navigator.hardwareConcurrency || 4;
+      const memory = navigator.deviceMemory || 8;
+
+      document.getElementById('cpuVal').innerText = cores + ' Luồng Logic';
+      document.getElementById('cpuSub').innerText = 'Nhận diện ' + cores + ' CPU cores qua trình duyệt';
+
+      document.getElementById('ramVal').innerText = '~' + memory + ' GB RAM';
+      document.getElementById('ramSub').innerText = 'Bộ nhớ ước lượng qua Web Sandbox';
+    } catch (e) {
+      document.getElementById('cpuVal').innerText = '4 Luồng Logic';
+      document.getElementById('ramVal').innerText = '~8 GB RAM';
+    }
+  }
+
+  // 2. Thử kết nối với TBK Core Desktop Agent (nếu app desktop đang bật)
+  async function checkDesktopAgent() {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1200);
+
+      const res = await fetch('http://127.0.0.1:45120/api/v1/snapshot', {
+        method: 'GET',
+        signal: controller.signal,
+        headers: { 'Accept': 'application/json' }
+      });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        isDesktopConnected = true;
+        
+        const box = document.getElementById('connectionStatus');
+        box.className = 'connection-status connected';
+        document.getElementById('statusText').innerText = '✅ Đã kết nối với TBK Core Desktop! Đang đồng bộ số liệu phần cứng THẬT.';
+        document.getElementById('statusIndicator').innerText = 'Trực tuyến (100% Chính xác)';
+
+        // Hiển thị số liệu thật từ desktop
+        document.getElementById('cpuVal').innerText = data.cpu.global_usage_percent.toFixed(1) + '% Tải';
+        document.getElementById('cpuSub').innerText = data.cpu.model_name + ' (' + data.cpu.logical_cores + ' Luồng)';
+
+        const usedRAM = (data.memory.used_bytes / 1073741824).toFixed(1);
+        const totalRAM = (data.memory.total_bytes / 1073741824).toFixed(1);
+        document.getElementById('ramVal').innerText = usedRAM + ' / ' + totalRAM + ' GB';
+        document.getElementById('ramSub').innerText = data.memory.usage_percent.toFixed(1) + '% RAM đang sử dụng thực tế';
+
+        if (data.disks && data.disks.length > 0) {
+          const mainDisk = data.disks[0];
+          const freeGB = (mainDisk.available_bytes / 1073741824).toFixed(1);
+          document.getElementById('diskVal').innerText = mainDisk.usage_percent.toFixed(1) + '% Dùng';
+          document.getElementById('diskSub').innerText = 'Ổ ' + mainDisk.mount_point + ' (' + freeGB + ' GB còn trống)';
+        }
+        return;
+      }
+    } catch (e) {
+      // Desktop app chưa bật -> Chạy chế độ web
+    }
+
+    if (!isDesktopConnected) {
+      detectBrowserMetrics();
+      document.getElementById('statusText').innerText = '💡 Chế độ Web: Trình duyệt chỉ đo được số liệu ước lượng. Cài đặt app để quét sâu 100%.';
+      document.getElementById('statusIndicator').innerText = 'Web Mode (Ước tính)';
+    }
+  }
+
+  // 3. Đo tốc độ xử lý CPU trên trình duyệt (Web Benchmark)
+  function runWebBenchmark() {
+    const btn = document.getElementById('runBenchmarkBtn');
+    const resultBox = document.getElementById('resultBox');
+    const resultDesc = document.getElementById('resultDesc');
+    
+    btn.disabled = true;
+    btn.innerText = '⏳ Đang tính toán 10 triệu phép tính...';
+
+    setTimeout(() => {
+      const start = performance.now();
+      let total = 0;
+      for (let i = 0; i < 10000000; i++) {
+        total += Math.sqrt(i);
+      }
+      const duration = (performance.now() - start).toFixed(1);
+
+      btn.disabled = false;
+      btn.innerText = '⚡ Bắt đầu đo tốc độ xử lý trên Web';
+
+      resultBox.style.display = 'block';
+      resultDesc.innerHTML = 'Thời gian phản hồi CPU trình duyệt: <strong>' + duration + ' ms</strong>.<br>Hệ thống xử lý mượt mà. Để quét nhiệt độ chip, xung nhịp MHz và kiểm tra danh sách tiến trình ngầm, hãy tải ứng dụng <strong>TBK Core</strong> bên dưới.';
+    }, 100);
+  }
+
+  // Khởi động khi tải trang
+  detectBrowserMetrics();
+  checkDesktopAgent();
+  setInterval(() => {
+    if (isDesktopConnected) checkDesktopAgent();
+  }, 3000);
+</script>
+
+</body>
+</html>

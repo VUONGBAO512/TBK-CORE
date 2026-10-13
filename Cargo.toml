@@ -1,0 +1,6 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/pc-doctor-core",
+    "apps/desktop/src-tauri",
+]

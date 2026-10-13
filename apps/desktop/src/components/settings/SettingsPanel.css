@@ -1,0 +1,46 @@
+.settings-panel { display: flex; flex-direction: column; gap: 16px; max-width: 560px; }
+
+.settings-card { display: flex; flex-direction: column; gap: 12px; }
+.setting-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.option-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.option-btn {
+  padding: 8px 18px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+}
+.option-btn:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+.option-btn.active {
+  background: rgba(56,189,248,0.12);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  font-weight: 600;
+}
+
+/* About card */
+.about-card { }
+.about-header { display: flex; align-items: center; gap: 14px; }
+.about-logo { font-size: 32px; }
+.about-name { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.about-version { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.about-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+.about-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
