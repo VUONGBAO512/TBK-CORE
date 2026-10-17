@@ -1,0 +1,8 @@
+--- a/apps/desktop/src-tauri/Cargo.toml
++++ b/apps/desktop/src-tauri/Cargo.toml
+@@ -32,3 +32,6 @@ tower-http = { version = "0.6", features = ["cors"] }
+ pc-doctor-core = { path = "../../../crates/pc-doctor-core" }
+ 
++[dev-dependencies]
++tempfile = "3"
++

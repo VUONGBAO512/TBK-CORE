@@ -83,8 +83,82 @@ export interface ProcessInfo {
 
 export interface ChatMessage {
   id: string;
-  sender: 'user' | 'assistant';
+  sender: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: string;
+  references?: string[];
+  findings?: DiagnosticFinding[];
+}
+
+// ==========================================
+// Milestone 3 Interface Contract Models
+// ==========================================
+
+export interface CleanableTarget {
+  id: string;
+  name_en: string;
+  name_vi: string;
+  description_en: string;
+  description_vi: string;
+  root_path: string;
+  file_count: number;
+  total_bytes: number;
+  is_safe: boolean;
+}
+
+export interface StorageScanReport {
+  targets: CleanableTarget[];
+  total_reclaimable_bytes: number;
+  total_files: number;
+  scanned_at: string;
+}
+
+export interface CleanRequest {
+  target_ids: string[];
+  dry_run: boolean;
+}
+
+export interface StorageCleanSummary {
+  dry_run: boolean;
+  bytes_freed: number;
+  files_deleted: number;
+  files_skipped_locked: number;
+  targets_processed: string[];
+  errors: string[];
+}
+
+export type ProcessCategory =
+  | 'System'
+  | 'BackgroundService'
+  | 'Application'
+  | 'BrowserEngine'
+  | 'system'
+  | 'background_service'
+  | 'application'
+  | 'browser_engine';
+
+export interface ProcessItem {
+  pid: number;
+  name: string;
+  cpu_percent: number;
+  memory_bytes: number;
+  status: string;
+  category: ProcessCategory;
+  is_protected: boolean;
+}
+
+export interface TerminateResult {
+  pid: number;
+  process_name: string;
+  success: boolean;
+  message: string;
+}
+
+export interface AssistantResponse {
+  response: string;
+  suggested_actions: string[];
+  confidence: number;
+  sources: string[];
+  reply?: string;
   references?: string[];
 }

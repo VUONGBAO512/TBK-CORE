@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { invoke } from '@tauri-apps/api/core';
-import { CompanionMood, ProcessInfo, SystemSnapshot } from '../types';
+import type { CompanionMood, ProcessItem, SystemSnapshot } from '../types';
+import { getSystemSnapshot, getProcessList } from '../api/ipc';
 
 export function useMonitoring(pollingIntervalMs: number = 2000) {
   const [snapshot, setSnapshot] = useState<SystemSnapshot | null>(null);
-  const [processes, setProcesses] = useState<ProcessInfo[]>([]);
+  const [processes, setProcesses] = useState<ProcessItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const isFetchingRef = useRef<boolean>(false);
@@ -13,8 +13,8 @@ export function useMonitoring(pollingIntervalMs: number = 2000) {
     if (isFetchingRef.current) return;
     isFetchingRef.current = true;
     try {
-      const snap = await invoke<SystemSnapshot>('get_system_snapshot');
-      const procs = await invoke<ProcessInfo[]>('get_process_list');
+      const snap = await getSystemSnapshot();
+      const procs = await getProcessList();
       setSnapshot(snap);
       setProcesses(procs);
       setError(null);

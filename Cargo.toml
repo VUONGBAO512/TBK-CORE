@@ -4,3 +4,12 @@ members = [
     "crates/pc-doctor-core",
     "apps/desktop/src-tauri",
 ]
+
+# Release optimizations for production desktop builds
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+panic = "abort"
+strip = true
+

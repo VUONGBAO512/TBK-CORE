@@ -1,8 +1,9 @@
 use chrono::Utc;
 use pc_doctor_core::models::{
     CpuCoreInfo, CpuSnapshot, DiskSnapshot, MemorySnapshot, OsSnapshot,
-    ProcessInfo, SystemSnapshot, TemperatureSensor,
+    ProcessInfo, ProcessItem, SystemSnapshot, TemperatureSensor,
 };
+use pc_doctor_core::processes::{categorize_process, ProcessGuard};
 use pc_doctor_core::DiagnosticEngine;
 use std::sync::Mutex;
 use sysinfo::{Components, Disks, System};
@@ -12,6 +13,7 @@ pub struct SystemCollector {
     disks: Disks,
     components: Components,
     engine: DiagnosticEngine,
+    guard: ProcessGuard,
 }
 
 impl Default for SystemCollector {
@@ -27,12 +29,14 @@ impl SystemCollector {
         let disks = Disks::new_with_refreshed_list();
         let components = Components::new_with_refreshed_list();
         let engine = DiagnosticEngine::new();
+        let guard = ProcessGuard::new();
 
         Self {
             sys,
             disks,
             components,
             engine,
+            guard,
         }
     }
 
@@ -157,17 +161,34 @@ impl SystemCollector {
         }
     }
 
-    pub fn get_top_processes(&self, limit: usize) -> Vec<ProcessInfo> {
-        let mut list: Vec<ProcessInfo> = self
+    /// Refreshes process list and metrics from operating system.
+    pub fn refresh_processes(&mut self) {
+        self.sys.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
+    }
+
+    /// Returns all running processes categorized and annotated with protection flags.
+    /// Sorted descending by CPU percentage, with fallback to memory usage.
+    pub fn get_process_list(&self) -> Vec<ProcessItem> {
+        let mut list: Vec<ProcessItem> = self
             .sys
             .processes()
             .iter()
-            .map(|(pid, proc)| ProcessInfo {
-                pid: pid.as_u32(),
-                name: proc.name().to_string_lossy().to_string(),
-                cpu_percent: proc.cpu_usage(),
-                memory_bytes: proc.memory(),
-                status: format!("{:?}", proc.status()),
+            .map(|(pid, proc)| {
+                let pid_u32 = pid.as_u32();
+                let name = proc.name().to_string_lossy().to_string();
+                let exe_path = proc.exe().and_then(|p| p.to_str());
+                let category = categorize_process(pid_u32, &name, exe_path);
+                let is_protected = self.guard.is_protected(pid_u32, &name);
+
+                ProcessItem {
+                    pid: pid_u32,
+                    name,
+                    cpu_percent: proc.cpu_usage(),
+                    memory_bytes: proc.memory(),
+                    status: format!("{:?}", proc.status()),
+                    category,
+                    is_protected,
+                }
             })
             .collect();
 
@@ -179,14 +200,91 @@ impl SystemCollector {
                 .then_with(|| b.memory_bytes.cmp(&a.memory_bytes))
         });
 
+        list
+    }
+
+    /// Returns top resource-consuming processes as `Vec<ProcessInfo>` for diagnostic evaluation.
+    pub fn get_top_processes(&self, limit: usize) -> Vec<ProcessInfo> {
+        let mut list = self.get_process_list();
         if list.len() > limit {
             list.truncate(limit);
         }
+        list.into_iter().map(ProcessInfo::from).collect()
+    }
 
-        list
+    /// Accessor for underlying ProcessGuard
+    pub fn guard(&self) -> &ProcessGuard {
+        &self.guard
     }
 }
 
 pub struct CollectorState {
     pub collector: Mutex<SystemCollector>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use pc_doctor_core::models::ProcessCategory;
+
+    #[test]
+    fn test_system_collector_initialization() {
+        let collector = SystemCollector::new();
+        assert!(!collector.guard().is_protected(999999, "harmless_app.exe"));
+        assert!(collector.guard().is_protected(4, "System"));
+    }
+
+    #[test]
+    fn test_system_collector_get_process_list_populates_category_and_protection() {
+        let collector = SystemCollector::new();
+        let processes = collector.get_process_list();
+        
+        assert!(!processes.is_empty(), "Process list should not be empty on host system");
+        
+        // Check that at least one process has a valid category
+        let has_categorized = processes.iter().any(|p| {
+            matches!(
+                p.category,
+                ProcessCategory::System
+                    | ProcessCategory::BackgroundService
+                    | ProcessCategory::Application
+                    | ProcessCategory::BrowserEngine
+            )
+        });
+        assert!(has_categorized, "All processes must be assigned valid categories");
+
+        // Check that core system processes have is_protected = true
+        let has_protected = processes.iter().any(|p| p.is_protected);
+        assert!(has_protected, "Running system must contain protected processes");
+
+        // Verify descending sort order
+        for i in 1..processes.len() {
+            assert!(
+                processes[i - 1].cpu_percent >= processes[i].cpu_percent
+                    || (processes[i - 1].cpu_percent == processes[i].cpu_percent
+                        && processes[i - 1].memory_bytes >= processes[i].memory_bytes),
+                "Processes must be sorted descending by CPU percent then memory"
+            );
+        }
+    }
+
+    #[test]
+    fn test_system_collector_top_processes_conversion() {
+        let collector = SystemCollector::new();
+        let top5 = collector.get_top_processes(5);
+        assert!(top5.len() <= 5);
+        for proc in &top5 {
+            assert!(!proc.name.is_empty());
+        }
+    }
+
+    #[test]
+    fn test_system_collector_take_snapshot() {
+        let mut collector = SystemCollector::new();
+        let snapshot = collector.take_snapshot();
+        assert!(!snapshot.cpu.model_name.is_empty());
+        assert!(snapshot.memory.total_bytes > 0);
+        assert!(!snapshot.os.name.is_empty());
+    }
+}
+

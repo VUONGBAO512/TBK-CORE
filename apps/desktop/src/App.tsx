@@ -5,11 +5,13 @@ import { Companion } from './components/companion/Companion';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { ChatPanel } from './components/chat/ChatPanel';
 import { ProcessPanel } from './components/processes/ProcessPanel';
+import { StorageCleanerPanel } from './components/storage/StorageCleanerPanel';
 import { SettingsPanel } from './components/settings/SettingsPanel';
+import type { SystemSnapshot } from './types';
 import './styles/theme.css';
 import './App.css';
 
-type NavPage = 'dashboard' | 'chat' | 'processes' | 'diagnostics' | 'security' | 'storage' | 'settings';
+type NavPage = 'dashboard' | 'chat' | 'processes' | 'security' | 'storage' | 'settings';
 
 function AppInner() {
   const { t, lang, setLang } = useI18n();
@@ -105,7 +107,7 @@ function AppInner() {
           <div className="live-status-pill">
             <span className="live-status-dot" />
             <span className="live-status-text">
-              {loading ? 'Đang đọc...' : 'Hệ thống ổn định'}
+              {loading ? t.status_reading : t.status_optimal}
             </span>
           </div>
         </div>
@@ -127,7 +129,7 @@ function AppInner() {
             <SecurityWatchSection snapshot={snapshot} />
           )}
           {page === 'storage' && (
-            <StorageAdvisorSection snapshot={snapshot} />
+            <StorageCleanerPanel snapshot={snapshot} />
           )}
           {page === 'settings' && (
             <SettingsPanel pollingMs={pollingMs} setPollingMs={setPollingMs} />
@@ -162,10 +164,10 @@ function AppInner() {
   );
 }
 
-// In-app Security Watch component (Section 12 of master prompt)
-function SecurityWatchSection({ snapshot }: { snapshot: any }) {
+// In-app Security Watch component
+function SecurityWatchSection({ snapshot }: { snapshot: SystemSnapshot | null }) {
   const { t } = useI18n();
-  const highCpuProcs = snapshot?.findings.filter((f: any) => f.rule_id === 'PERF_UNUSUAL_CPU_PROCESS') || [];
+  const highCpuProcs = snapshot?.findings.filter((f) => f.rule_id === 'PERF_UNUSUAL_CPU_PROCESS') || [];
 
   return (
     <div className="security-section card">
@@ -173,7 +175,7 @@ function SecurityWatchSection({ snapshot }: { snapshot: any }) {
       <div className="security-banner">
         <span className="sec-icon">🛡️</span>
         <div>
-          <h3>{t.sec_status}: An toàn</h3>
+          <h3>{t.sec_status}: {t.sec_safe}</h3>
           <p>{t.sec_verified_note}</p>
         </div>
       </div>
@@ -184,7 +186,7 @@ function SecurityWatchSection({ snapshot }: { snapshot: any }) {
             <span className="sec-check">✅</span>
             <strong>{t.sec_firewall}</strong>
           </div>
-          <p>Tường lửa Windows Defender đang chạy ở chế độ bảo vệ chuẩn.</p>
+          <p>{t.sec_firewall_desc}</p>
         </div>
 
         <div className="sec-item card">
@@ -198,80 +200,14 @@ function SecurityWatchSection({ snapshot }: { snapshot: any }) {
 
       {highCpuProcs.length > 0 && (
         <div className="sec-alert-box">
-          <h4>⚠️ Cảnh báo tiến trình tiêu hao tài nguyên bất thường:</h4>
+          <h4>⚠️ {t.sec_alert_procs}</h4>
           <ul>
-            {highCpuProcs.map((p: any, idx: number) => (
+            {highCpuProcs.map((p, idx: number) => (
               <li key={idx}><strong>{p.title}</strong>: {p.description}</li>
             ))}
           </ul>
         </div>
       )}
-    </div>
-  );
-}
-
-// In-app Storage Advisor component (Section 13 of master prompt)
-function StorageAdvisorSection({ snapshot }: { snapshot: any }) {
-  const { t } = useI18n();
-  const disks = snapshot?.disks || [];
-
-  return (
-    <div className="storage-section card">
-      <h1 className="page-title">{t.storage_title}</h1>
-      <div className="storage-disks-list">
-        {disks.map((d: any, idx: number) => {
-          const usedGB = (d.used_bytes / 1_073_741_824).toFixed(1);
-          const totalGB = (d.total_bytes / 1_073_741_824).toFixed(1);
-          const freeGB = (d.available_bytes / 1_073_741_824).toFixed(1);
-          return (
-            <div key={idx} className="storage-card card">
-              <div className="storage-head">
-                <span className="disk-badge">{d.mount_point}</span>
-                <span className="disk-name">{d.name || 'Ổ đĩa cục bộ'} ({d.filesystem})</span>
-                <span className="disk-pct">{d.usage_percent.toFixed(1)}%</span>
-              </div>
-              <div className="progress-bar-track">
-                <div
-                  className="progress-bar-fill healthy"
-                  style={{ width: `${Math.min(d.usage_percent, 100)}%` }}
-                />
-              </div>
-              <div className="storage-stats">
-                <span>Đã dùng: {usedGB} GB</span>
-                <span>Khả dụng: {freeGB} GB</span>
-                <span>Tổng cộng: {totalGB} GB</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="storage-recommendations">
-        <h3>💡 {t.storage_quick_clean}</h3>
-        <div className="storage-tips-grid">
-          <div className="tip-card card">
-            <span className="tip-icon">🗑️</span>
-            <div>
-              <strong>Thùng rác</strong>
-              <p>{t.storage_tip_recycle}</p>
-            </div>
-          </div>
-          <div className="tip-card card">
-            <span className="tip-icon">🧹</span>
-            <div>
-              <strong>Tệp tạm hệ thống (%TEMP%)</strong>
-              <p>{t.storage_tip_temp}</p>
-            </div>
-          </div>
-          <div className="tip-card card">
-            <span className="tip-icon">📂</span>
-            <div>
-              <strong>Thư mục Tải về (Downloads)</strong>
-              <p>{t.storage_tip_downloads}</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

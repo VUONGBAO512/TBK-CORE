@@ -1,0 +1,10 @@
+--- a/apps/desktop/src-tauri/src/commands/mod.rs
++++ b/apps/desktop/src-tauri/src/commands/mod.rs
+@@ -1,4 +1,7 @@
++pub mod storage;
++
++pub use storage::{clean_storage_targets, scan_cleanable_storage};
++
+ use crate::monitoring::CollectorState;
+ use pc_doctor_core::knowledge::KnowledgeBase;
+ use pc_doctor_core::models::{ProcessInfo, SystemSnapshot};

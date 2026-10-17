@@ -1,9 +1,14 @@
+pub mod process;
+pub mod storage;
+
+pub use process::{get_process_list, terminate_process, terminate_process_with_guard};
+pub use storage::{clean_storage_targets, scan_cleanable_storage};
+
 use crate::monitoring::CollectorState;
 use pc_doctor_core::knowledge::KnowledgeBase;
-use pc_doctor_core::models::{ProcessInfo, SystemSnapshot};
-use tauri::State;
-
+use pc_doctor_core::models::SystemSnapshot;
 use std::sync::Arc;
+use tauri::State;
 
 #[tauri::command]
 pub fn get_system_snapshot(state: State<'_, Arc<CollectorState>>) -> Result<SystemSnapshot, String> {
@@ -12,15 +17,6 @@ pub fn get_system_snapshot(state: State<'_, Arc<CollectorState>>) -> Result<Syst
         .lock()
         .map_err(|e| format!("Failed to acquire collector lock: {}", e))?;
     Ok(collector.take_snapshot())
-}
-
-#[tauri::command]
-pub fn get_process_list(state: State<'_, Arc<CollectorState>>) -> Result<Vec<ProcessInfo>, String> {
-    let collector = state
-        .collector
-        .lock()
-        .map_err(|e| format!("Failed to acquire collector lock: {}", e))?;
-    Ok(collector.get_top_processes(30))
 }
 
 #[derive(serde::Serialize)]

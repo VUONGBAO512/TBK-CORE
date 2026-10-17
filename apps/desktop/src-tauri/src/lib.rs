@@ -2,7 +2,10 @@ pub mod commands;
 pub mod monitoring;
 pub mod server;
 
-use commands::{get_process_list, get_system_snapshot, query_assistant};
+use commands::{
+    clean_storage_targets, get_process_list, get_system_snapshot, query_assistant,
+    scan_cleanable_storage, terminate_process,
+};
 use monitoring::{CollectorState, SystemCollector};
 use server::start_pairing_server;
 use std::sync::{Arc, Mutex};
@@ -27,6 +30,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_system_snapshot,
             get_process_list,
+            terminate_process,
+            scan_cleanable_storage,
+            clean_storage_targets,
             query_assistant
         ])
         .run(tauri::generate_context!())

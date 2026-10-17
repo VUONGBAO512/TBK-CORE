@@ -1,0 +1,15 @@
+--- a/apps/desktop/src-tauri/src/lib.rs
++++ b/apps/desktop/src-tauri/src/lib.rs
+@@ -5,3 +5,4 @@
+-use commands::{get_process_list, get_system_snapshot, query_assistant};
++use commands::{
++    clean_storage_targets, get_process_list, get_system_snapshot, query_assistant,
++    scan_cleanable_storage,
++};
+@@ -28,3 +29,5 @@
+             get_system_snapshot,
+             get_process_list,
+-            query_assistant
++            query_assistant,
++            scan_cleanable_storage,
++            clean_storage_targets

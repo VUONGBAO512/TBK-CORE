@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct KnowledgeArticle {
     pub id: String,
     pub keywords: Vec<String>,
@@ -81,9 +81,41 @@ impl KnowledgeBase {
                 content_en: "Key guidelines for a fast and healthy PC:\n1. Keep Startup items minimal (Task Manager -> Startup tab).\n2. Restart your computer at least once a week to clear system handles and leaked memory.\n3. Keep Windows and drivers up to date.\n4. Monitor background processes using TBK Core dashboard regularly.".to_string(),
                 content_vi: "Nguyên tắc giúp máy tính luôn mượt mà và bền bỉ:\n1. Giảm thiểu các ứng dụng khởi động cùng Windows (Task Manager > Startup tab).\n2. Khởi động lại máy ít nhất một lần mỗi tuần để giải phóng bộ nhớ và tiến trình tồn đọng.\n3. Cập nhật Windows và driver phần cứng định kỳ.\n4. Thường xuyên theo dõi bảng điều khiển TBK Core để phát hiện sớm các dấu hiệu quá tải.".to_string(),
             },
+            KnowledgeArticle {
+                id: "storage_cleanup_safety".to_string(),
+                keywords: vec![
+                    "clean".to_string(), "cleanup".to_string(), "temp".to_string(), "temporary".to_string(),
+                    "safe".to_string(), "dry-run".to_string(), "dry run".to_string(), "storage".to_string(),
+                    "dọn rác".to_string(), "file tạm".to_string(), "an toàn".to_string(), "dọn dẹp".to_string(),
+                    "xóa rác".to_string(), "thư mục tạm".to_string(), "reclaim".to_string(), "xóa file".to_string(),
+                    "crash dump".to_string(), "wer".to_string(), "thumbnail".to_string(),
+                ],
+                title_en: "Safe Storage & Temporary Cache Cleanup Guide".to_string(),
+                title_vi: "Hướng dẫn Dọn dẹp Bộ nhớ tạm & An toàn Lưu trữ".to_string(),
+                content_en: "Best practices for safe storage cleanup in TBK Core:\n1. Designated Safe Targets: Safe cleanup targets include User Temporary files (%TEMP%), Windows Error Reporting crash dumps (WER), application log files, and Windows thumbnail caches.\n2. Protected Boundary Guard: System-critical directories (C:\\Windows, System32, Program Files) and user personal folders (Desktop, Documents, Downloads) are strictly whitelisted/blacklisted and never deleted.\n3. Dry-Run Simulation: Always perform a dry-run first to preview exactly which files will be removed and calculate total reclaimable bytes without altering disk contents.\n4. Locked File Protection: Files currently opened or locked by active background applications are safely skipped without aborting or causing system instability.".to_string(),
+                content_vi: "Nguyên tắc dọn dẹp dung lượng và bộ nhớ đệm an toàn trong TBK Core:\n1. Vùng dữ liệu an toàn: Các khu vực được phép dọn dẹp bao gồm Thư mục tạm người dùng (%TEMP%), Báo cáo sự cố Windows (WER Crash Dumps), Nhật ký ứng dụng (App Logs) và Bộ nhớ đệm hình thu nhỏ (Thumbnail Cache).\n2. Ranh giới bảo vệ nghiêm ngặt: Tuyệt đối không xóa các thư mục hệ thống (C:\\Windows, System32, Program Files) cũng như dữ liệu cá nhân (Desktop, Documents, Downloads).\n3. Chế độ Quét mô phỏng (Dry-Run): Luôn bật chế độ Dry-Run để tính toán trước dung lượng có thể giải phóng mà không làm thay đổi hay xóa bất kỳ tệp tin nào.\n4. Cơ chế bỏ qua tệp đang sử dụng: Những tệp đang bị ứng dụng khác khóa hoặc ghi dữ liệu sẽ được tự động bỏ qua an toàn, không làm gián đoạn hay treo phần mềm.".to_string(),
+            },
+            KnowledgeArticle {
+                id: "process_management_safety".to_string(),
+                keywords: vec![
+                    "process".to_string(), "terminate".to_string(), "kill".to_string(), "blacklist".to_string(),
+                    "protected".to_string(), "runaway".to_string(), "csrss".to_string(), "lsass".to_string(),
+                    "services".to_string(), "smss".to_string(), "explorer".to_string(), "tiến trình".to_string(),
+                    "tắt tiến trình".to_string(), "đóng ứng dụng".to_string(), "bảo vệ".to_string(),
+                    "danh sách đen".to_string(), "an toàn tiến trình".to_string(), "task".to_string(),
+                ],
+                title_en: "Process Management Safety & Critical Windows Guardrails".to_string(),
+                title_vi: "Quy tắc Quản lý Tiến trình An toàn & Bảo vệ Hệ thống".to_string(),
+                content_en: "Guidelines for safe process termination and resource management:\n1. Hardcoded Safety Blacklist: Essential Windows OS services—such as csrss.exe, lsass.exe, services.exe, smss.exe, wininit.exe, and explorer.exe—are strictly protected. Terminating them is blocked by TBK Core to prevent system crash or Blue Screen of Death (BSOD).\n2. Process Categorization: Processes are classified into System, Background Service, Application, and Browser Engine. Inspect categories before deciding to terminate.\n3. Runaway Process Handling: Processes consuming >80% CPU or excessive RAM over sustained periods should be analyzed. Try closing the application window gracefully before forcing termination.\n4. Multi-Process Applications: Modern browsers and electron apps spawn multiple helper processes. Terminating individual tabs or renderer workers can free memory without closing the entire application.".to_string(),
+                content_vi: "Hướng dẫn quản lý và kết thúc tiến trình an toàn:\n1. Danh sách bảo vệ bất khả xâm phạm (Safety Blacklist): Các tiến trình lõi của hệ điều hành Windows—như csrss.exe, lsass.exe, services.exe, smss.exe, wininit.exe, và explorer.exe—được khóa an toàn cứng. TBK Core từ chối lệnh đóng các tiến trình này để ngăn chặn lỗi màn hình xanh (BSOD) hoặc sập hệ thống.\n2. Phân loại tiến trình: Hệ thống phân chia thành Tiến trình hệ thống (System), Dịch vụ nền (Background Service), Ứng dụng người dùng (Application) và Nhân trình duyệt (Browser Engine). Hãy kiểm tra danh mục trước khi thực hiện đóng.\n3. Xử lý tiến trình chạy bất thường (Runaway): Những tiến trình ngốn >80% CPU hoặc rò rỉ RAM kéo dài cần được kiểm tra. Ưu tiên tắt qua giao diện ứng dụng trước khi buộc dừng bằng lệnh.\n4. Ứng dụng đa tiến trình: Trình duyệt web và ứng dụng nền tảng Chromium/Electron thường mở nhiều tiến trình phụ. Bạn có thể giải phóng tài nguyên bằng cách đóng từng tab thay vì tắt toàn bộ ứng dụng.".to_string(),
+            },
         ];
 
         Self { articles }
+    }
+
+    pub fn get_by_id(&self, id: &str) -> Option<&KnowledgeArticle> {
+        self.articles.iter().find(|art| art.id == id)
     }
 
     pub fn search(&self, query: &str) -> Vec<&KnowledgeArticle> {
@@ -94,7 +126,10 @@ impl KnowledgeBase {
             .iter()
             .filter(|art| {
                 art.keywords.iter().any(|k| q.contains(k))
-                    || words.iter().any(|&w| art.title_en.to_lowercase().contains(w) || art.title_vi.to_lowercase().contains(w))
+                    || words.iter().any(|&w| {
+                        art.title_en.to_lowercase().contains(w)
+                            || art.title_vi.to_lowercase().contains(w)
+                    })
             })
             .collect()
     }
